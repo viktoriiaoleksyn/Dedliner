@@ -1,0 +1,2597 @@
+
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Дедлайнер — студентський планер</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: linear-gradient(135deg, #ffe3ef, #fff8fc);
+    }
+
+    button,
+    input,
+    textarea,
+    select {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    .app {
+      --bg: #fff9fc;
+      --card: #ffffff;
+      --text: #352b3a;
+      --muted: #968b99;
+      --pink: #f35b9d;
+      --pink-dark: #dc3d83;
+      --soft: #fff0f6;
+      --border: #f2e4ec;
+
+      position: relative;
+      width: 100%;
+      max-width: 460px;
+      height: 800px;
+      overflow: hidden;
+      border-radius: 28px;
+      background: var(--bg);
+      color: var(--text);
+      box-shadow: 0 20px 60px #a94d7b30;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    .app.dark {
+      --bg: #211c27;
+      --card: #302735;
+      --text: #fff0f7;
+      --muted: #b9aaba;
+      --pink: #fa7caf;
+      --pink-dark: #ff9bc5;
+      --soft: #422b3c;
+      --border: #493c4b;
+    }
+
+    .screen {
+      height: 100%;
+      overflow-y: auto;
+      padding: 24px 22px 140px;
+      scrollbar-width: thin;
+    }
+
+    /* Шапка */
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 23px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+    }
+
+    .brand-icon {
+      display: grid;
+      place-items: center;
+      width: 43px;
+      height: 43px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #ff8fba, #e94d91);
+      color: white;
+      animation: breathe 3s infinite;
+    }
+
+    .brand-name {
+      font-size: 21px;
+      font-weight: 850;
+      letter-spacing: -0.7px;
+    }
+
+    .brand-name span {
+      color: var(--pink);
+    }
+
+    .brand-subtitle {
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 10px;
+    }
+
+    .avatar {
+      display: grid;
+      place-items: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--soft);
+      color: var(--pink);
+    }
+
+    
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      padding: 23px 20px;
+      border-radius: 22px;
+      background: linear-gradient(130deg, #f978ae, #e84e92);
+      color: white;
+      box-shadow: 0 10px 25px #ef5a9b30;
+    }
+
+    .hero-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+
+    .hero h1 {
+      margin: 10px 0;
+      font-size: 25px;
+      line-height: 1.2;
+    }
+
+    .hero p {
+      max-width: 260px;
+      margin: 0;
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .hero-flower {
+      position: absolute;
+      right: 22px;
+      top: 48px;
+      font-size: 56px;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin: 17px 0 26px;
+    }
+
+    .stat {
+      padding: 15px 8px;
+      border: 1px solid var(--border);
+      border-radius: 17px;
+      background: var(--card);
+      text-align: center;
+    }
+
+    .stat strong {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 25px;
+    }
+
+    .stat:nth-child(2) strong {
+      color: var(--pink);
+    }
+
+    .stat:nth-child(3) strong {
+      color: #54bd97;
+    }
+
+    .stat span {
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    
+
+    .section-heading {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin: 0 0 14px;
+    }
+
+    .section-heading h2 {
+      margin: 0;
+      font-size: 18px;
+    }
+
+    .section-heading small {
+      color: var(--muted);
+    }
+
+    .page-title {
+      margin: 0 0 6px;
+      font-size: 25px;
+    }
+
+    .page-subtitle {
+      margin: 0 0 23px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    
+
+    .filters {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .filter {
+      flex: 1;
+      padding: 10px 5px;
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      background: var(--card);
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      transition: 0.2s;
+    }
+
+    .filter.active {
+      border-color: var(--pink);
+      background: var(--pink);
+      color: white;
+    }
+
+    
+
+    .task {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 11px;
+      padding: 15px 13px;
+      border: 1px solid var(--border);
+      border-radius: 17px;
+      background: var(--card);
+      animation: slideIn 0.3s ease both;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .task:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px #d15d9515;
+    }
+
+    .task-check {
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+      width: 25px;
+      height: 25px;
+      margin-top: 2px;
+      padding: 0;
+      border: 2px solid #e9bfd3;
+      border-radius: 9px;
+      background: transparent;
+      color: white;
+    }
+
+    .task-check.checked {
+      border-color: #52be98;
+      background: #52be98;
+      animation: pop 0.35s;
+    }
+
+    .task-body {
+      flex: 1;
+      min-width: 0;
+      padding: 0;
+      border: none;
+      background: transparent;
+      color: var(--text);
+      text-align: left;
+    }
+
+    .task-title {
+      margin-bottom: 5px;
+      font-size: 13px;
+      font-weight: 800;
+      overflow-wrap: anywhere;
+    }
+
+    .task-title.done {
+      color: var(--muted);
+      text-decoration: line-through;
+    }
+
+    .task-description {
+      margin: 0 0 10px;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.5;
+      overflow-wrap: anywhere;
+    }
+
+    .task-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 6px 8px;
+      border-radius: 8px;
+      background: var(--soft);
+      color: var(--pink-dark);
+      font-size: 10px;
+      font-weight: 700;
+    }
+
+    .tag.late {
+      background: #fff0eb;
+      color: #e36b55;
+    }
+
+    .tag.completed {
+      background: #e5f8ef;
+      color: #319b73;
+    }
+
+    .task-arrow {
+      margin-top: 3px;
+      color: var(--muted);
+    }
+
+    
+
+    .empty {
+      padding: 36px 20px;
+      border: 1px dashed #ecbad0;
+      border-radius: 19px;
+      background: var(--card);
+      color: var(--muted);
+      text-align: center;
+      font-size: 12px;
+      line-height: 1.7;
+    }
+
+    .empty-emoji {
+      display: block;
+      margin-bottom: 10px;
+      font-size: 37px;
+    }
+
+    
+
+    .navigation {
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      z-index: 5;
+      display: flex;
+      justify-content: space-around;
+      height: 78px;
+      padding: 12px 8px;
+      border-top: 1px solid var(--border);
+      background: var(--card);
+    }
+
+    .nav-button {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      min-width: 80px;
+      padding: 4px 8px;
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 700;
+    }
+
+    .nav-button.active {
+      color: var(--pink);
+    }
+
+    .nav-button.active svg {
+      animation: pop 0.35s;
+    }
+
+    
+
+    .fab {
+      position: absolute;
+      right: 23px;
+      bottom: 94px;
+      z-index: 4;
+      display: grid;
+      place-items: center;
+      width: 58px;
+      height: 58px;
+      border: none;
+      border-radius: 19px;
+      background: linear-gradient(135deg, #ff86b6, #e94b90);
+      color: white;
+      box-shadow: 0 9px 22px #eb579a55;
+      transition: transform 0.25s;
+    }
+
+    .fab:hover {
+      transform: rotate(90deg) scale(1.08);
+    }
+
+    
+
+    .calendar-card {
+      margin-bottom: 23px;
+      padding: 17px 13px;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      background: var(--card);
+    }
+
+    .calendar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 17px;
+    }
+
+    .calendar-month {
+      font-size: 16px;
+      font-weight: 800;
+    }
+
+    .calendar-arrows {
+      display: flex;
+      gap: 7px;
+    }
+
+    .icon-button {
+      display: grid;
+      place-items: center;
+      width: 33px;
+      height: 33px;
+      border: none;
+      border-radius: 10px;
+      background: var(--soft);
+      color: var(--pink);
+    }
+
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 4px;
+      text-align: center;
+    }
+
+    .weekday {
+      padding: 6px 0 10px;
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 800;
+    }
+
+    .calendar-day {
+      position: relative;
+      display: grid;
+      place-items: center;
+      height: 42px;
+      border: none;
+      border-radius: 12px;
+      background: transparent;
+      color: var(--text);
+      font-size: 12px;
+    }
+
+    .calendar-day.today {
+      outline: 1px solid #f4b4d0;
+      outline-offset: -2px;
+    }
+
+    .calendar-day.selected {
+      background: var(--pink);
+      color: white;
+    }
+
+    .calendar-dot {
+      position: absolute;
+      bottom: 4px;
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--pink);
+    }
+
+    .calendar-day.selected .calendar-dot {
+      background: white;
+    }
+
+    
+
+    .settings-card {
+      margin-bottom: 19px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: 19px;
+      background: var(--card);
+    }
+
+    .setting-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .setting-row:last-child {
+      border-bottom: none;
+    }
+
+    .setting-icon {
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: var(--soft);
+      color: var(--pink);
+    }
+
+    .setting-text {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .setting-text strong {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 12px;
+    }
+
+    .setting-text small {
+      display: block;
+      color: var(--muted);
+      font-size: 10px;
+      line-height: 1.5;
+    }
+
+    .switch {
+      flex-shrink: 0;
+      width: 43px;
+      height: 26px;
+      padding: 3px;
+      border: none;
+      border-radius: 20px;
+      background: #ded2db;
+      transition: background 0.2s;
+    }
+
+    .switch::before {
+      display: block;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: white;
+      content: "";
+      transition: transform 0.2s;
+    }
+
+    .switch.on {
+      background: var(--pink);
+    }
+
+    .switch.on::before {
+      transform: translateX(17px);
+    }
+
+    .small-select {
+      max-width: 125px;
+      padding: 8px;
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 11px;
+    }
+
+    .profile-input {
+      width: 100%;
+      padding: 11px;
+      border: 1px solid var(--border);
+      border-radius: 11px;
+      background: var(--bg);
+      color: var(--text);
+      outline: none;
+    }
+
+    .profile-box {
+      padding: 16px;
+    }
+
+    .profile-box label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .note {
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.6;
+    }
+
+    
+    .overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 10;
+      display: flex;
+      align-items: flex-end;
+      background: #25132299;
+    }
+
+    .overlay[hidden] {
+      display: none;
+    }
+
+    .modal {
+      width: 100%;
+      max-height: 93%;
+      overflow-y: auto;
+      padding: 23px 22px 30px;
+      border-radius: 26px 26px 0 0;
+      background: var(--card);
+      animation: modalUp 0.3s ease both;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 21px;
+    }
+
+    .modal-header h2 {
+      margin: 0;
+      font-size: 20px;
+    }
+
+    .close-button {
+      display: grid;
+      place-items: center;
+      width: 35px;
+      height: 35px;
+      border: none;
+      border-radius: 11px;
+      background: var(--soft);
+      color: var(--pink);
+    }
+
+    
+
+    .field {
+      margin-bottom: 15px;
+    }
+
+    .field label {
+      display: block;
+      margin-bottom: 7px;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .field input,
+    .field textarea,
+    .field select {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--bg);
+      color: var(--text);
+      outline: none;
+      font-size: 13px;
+    }
+
+    .field textarea {
+      min-height: 80px;
+      resize: vertical;
+    }
+
+    .field input:focus,
+    .field textarea:focus,
+    .field select:focus {
+      border-color: var(--pink);
+    }
+
+    .field input.invalid {
+      border-color: #e94e6a;
+      background: #fff0f2;
+      color: #352b3a;
+    }
+
+    .error-message {
+      min-height: 15px;
+      margin-top: 5px;
+      color: #e94e6a;
+      font-size: 11px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    
+
+    .primary-button,
+    .secondary-button {
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      padding: 13px 16px;
+      border: none;
+      border-radius: 13px;
+      font-size: 12px;
+      font-weight: 800;
+      transition: transform 0.2s;
+    }
+
+    .primary-button {
+      background: var(--pink);
+      color: white;
+    }
+
+    .secondary-button {
+      border: 1px solid var(--border);
+      background: var(--soft);
+      color: var(--pink-dark);
+    }
+
+    .danger-button {
+      background: #fff0f2;
+      color: #e85d75;
+    }
+
+    .full-width {
+      width: 100%;
+    }
+
+    .button-row {
+      display: flex;
+      gap: 9px;
+      margin-top: 18px;
+    }
+
+    .button-row > button {
+      flex: 1;
+    }
+
+    button:active {
+      transform: scale(0.96);
+    }
+
+    
+
+    .detail-title {
+      margin: 12px 0;
+      font-size: 24px;
+      overflow-wrap: anywhere;
+    }
+
+    .detail-description {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.7;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    .detail-info {
+      display: grid;
+      gap: 14px;
+      margin-top: 20px;
+      padding: 16px;
+      border: 1px solid var(--border);
+      border-radius: 15px;
+      background: var(--bg);
+    }
+
+    .info-row {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      font-size: 12px;
+    }
+
+    .info-row svg {
+      color: var(--pink);
+    }
+
+    
+
+    .success {
+      position: relative;
+      padding: 15px 0 10px;
+      text-align: center;
+    }
+
+    .success-icon {
+      display: grid;
+      place-items: center;
+      width: 85px;
+      height: 85px;
+      margin: 12px auto 20px;
+      border-radius: 50%;
+      background: var(--pink);
+      color: white;
+      animation: pop 0.55s ease both;
+    }
+
+    .success-icon svg {
+      width: 43px;
+      height: 43px;
+      animation: pop 0.6s 0.15s both;
+    }
+
+    .success h2 {
+      margin: 0 0 10px;
+      font-size: 24px;
+    }
+
+    .success p {
+      margin-bottom: 24px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .confetti {
+      position: absolute;
+      top: 0;
+      font-size: 23px;
+      animation: float 2s infinite;
+    }
+
+    .confetti.left {
+      left: 22px;
+    }
+
+    .confetti.right {
+      right: 22px;
+      animation-delay: 0.4s;
+    }
+
+    
+
+    .toast {
+      position: absolute;
+      top: 17px;
+      right: 20px;
+      left: 20px;
+      z-index: 20;
+      padding: 14px;
+      border-radius: 13px;
+      background: #35263a;
+      color: white;
+      text-align: center;
+      font-size: 12px;
+      font-weight: 700;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(-100px);
+      transition: opacity 0.3s, transform 0.3s;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    
+
+    @keyframes breathe {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.07); }
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0) rotate(10deg); }
+      50% { transform: translateY(-10px) rotate(-5deg); }
+    }
+
+    @keyframes pop {
+      0% { transform: scale(0.5); }
+      65% { transform: scale(1.15); }
+      100% { transform: scale(1); }
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(12px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes modalUp {
+      from {
+        opacity: 0.5;
+        transform: translateY(45px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+
+
+    @media (max-width: 500px) {
+      body {
+        padding: 0;
+        background: var(--bg);
+      }
+
+      .app {
+        max-width: none;
+        height: 100dvh;
+        border-radius: 0;
+        box-shadow: none;
+      }
+
+      .screen {
+        padding: 22px 17px 135px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="app" id="app">
+
+    <main class="screen" id="screen"></main>
+
+    <button
+      class="fab"
+      id="addButton"
+      aria-label="Додати завдання">
+    </button>
+
+    <nav class="navigation" id="navigation"></nav>
+
+    <div class="overlay" id="overlay" hidden></div>
+
+    <div class="toast" id="toast" role="status"></div>
+
+  </div>
+
+  <script>
+    
+
+    const app = document.getElementById("app");
+    const screen = document.getElementById("screen");
+    const navigation = document.getElementById("navigation");
+    const addButton = document.getElementById("addButton");
+    const overlay = document.getElementById("overlay");
+    const toast = document.getElementById("toast");
+
+    
+
+    const icons = {
+      home: '<path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/>',
+
+      calendar: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4M17 3v4M3 10h18"/>',
+
+      settings: '<path d="M12 3a2 2 0 0 1 2 2l1.5.6 1.8-.7 2 2-1 1.8.6 1.5 2.1.8v3l-2.1.8-.6 1.5 1 1.8-2 2-1.8-.7-1.5.6a2 2 0 0 1-4 0l-1.5-.6-1.8.7-2-2 1-1.8-.6-1.5L3 14v-3l2.1-.8.6-1.5-1-1.8 2-2 1.8.7L10 5a2 2 0 0 1 2-2Z"/><circle cx="12" cy="12.5" r="3"/>',
+
+      plus: '<path d="M12 5v14M5 12h14"/>',
+
+      check: '<path d="m5 12 4 4L19 6"/>',
+
+      clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+
+      bell: '<path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/>',
+
+      moon: '<path d="M20 15.2A8.5 8.5 0 0 1 8.8 4 8.5 8.5 0 1 0 20 15.2Z"/>',
+
+      user: '<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/>',
+
+      right: '<path d="m9 18 6-6-6-6"/>',
+
+      left: '<path d="m15 18-6-6 6-6"/>',
+
+      close: '<path d="M18 6 6 18M6 6l12 12"/>',
+
+      edit: '<path d="m4 20 4.5-1 11-11-3.5-3.5-11 11L4 20ZM14 6l3.5 3.5"/>',
+
+      trash: '<path d="M4 7h16M9 7V4h6v3M6 7l1 14h10l1-14M10 11v6M14 11v6"/>',
+
+      book: '<path d="M4 4h15v16H6a2 2 0 0 1-2-2V4Zm0 14a2 2 0 0 1 2-2h13"/>'
+    };
+
+    function icon(name, size = 20) {
+      return `
+        <svg
+          width="${size}"
+          height="${size}"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true">
+          ${icons[name] || ""}
+        </svg>
+      `;
+    }
+
+    
+    function escapeHTML(value) {
+      return String(value ?? "").replace(/[&<>"']/g, char => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+      }[char]));
+    }
+
+    
+
+    function pad(number) {
+      return String(number).padStart(2, "0");
+    }
+
+    function dateISO(date) {
+      return (
+        date.getFullYear() + "-" +
+        pad(date.getMonth() + 1) + "-" +
+        pad(date.getDate())
+      );
+    }
+
+    function dayAfter(days) {
+      const date = new Date();
+      date.setHours(12, 0, 0, 0);
+      date.setDate(date.getDate() + days);
+      return dateISO(date);
+    }
+
+    function today() {
+      return dayAfter(0);
+    }
+
+    function dateText(value) {
+      if (value === today()) return "Сьогодні";
+      if (value === dayAfter(1)) return "Завтра";
+
+      return new Date(value + "T12:00:00")
+        .toLocaleDateString("uk-UA", {
+          day: "numeric",
+          month: "short"
+        });
+    }
+
+    function fullDateText(value) {
+      return new Date(value + "T12:00:00")
+        .toLocaleDateString("uk-UA", {
+          weekday: "long",
+          day: "numeric",
+          month: "long",
+          year: "numeric"
+        });
+    }
+
+    function deadlineTime(task) {
+      return new Date(
+        task.date + "T" + task.time + ":00"
+      ).getTime();
+    }
+
+    function isOverdue(task) {
+      return !task.done && deadlineTime(task) < Date.now();
+    }
+
+    
+
+    const TASKS_KEY = "dedliner_tasks_v1";
+    const SETTINGS_KEY = "dedliner_settings_v1";
+    const REMINDERS_KEY = "dedliner_sent_reminders_v1";
+
+    function readStorage(key, fallback) {
+      try {
+        const value = JSON.parse(localStorage.getItem(key));
+        return value === null ? fallback : value;
+      } catch {
+        return fallback;
+      }
+    }
+
+    function writeStorage(key, value) {
+      try {
+        localStorage.setItem(key, JSON.stringify(value));
+      } catch {
+        console.warn("Не вдалося зберегти дані браузера");
+      }
+    }
+
+    function sampleTasks() {
+      return [
+        {
+          id: "sample-1",
+          title: "Здати практичну роботу №3",
+          description: "Завершити оформлення та здати роботу",
+          date: today(),
+          time: "23:59",
+          reminder: "60",
+          done: false
+        },
+        {
+          id: "sample-2",
+          title: "Підготувати презентацію",
+          description: "Підібрати матеріали для захисту",
+          date: dayAfter(1),
+          time: "15:00",
+          reminder: "60",
+          done: false
+        },
+        {
+          id: "sample-3",
+          title: "Опрацювати матеріали з UX",
+          description: "Прочитати конспект і зробити нотатки",
+          date: dayAfter(3),
+          time: "18:00",
+          reminder: "off",
+          done: false
+        }
+      ];
+    }
+
+    let tasks = readStorage(TASKS_KEY, null);
+
+    if (!Array.isArray(tasks)) {
+      tasks = sampleTasks();
+      writeStorage(TASKS_KEY, tasks);
+    }
+
+    let settings = {
+      name: "Студентка",
+      theme: "light",
+      notifications: false,
+      defaultReminder: "60",
+      ...readStorage(SETTINGS_KEY, {})
+    };
+
+    let sentReminders = new Set(
+      readStorage(REMINDERS_KEY, [])
+    );
+
+    function saveTasks() {
+      writeStorage(TASKS_KEY, tasks);
+    }
+
+    function saveSettings() {
+      writeStorage(SETTINGS_KEY, settings);
+    }
+
+    function createId() {
+      return (
+        "task-" +
+        Date.now() + "-" +
+        Math.random().toString(36).slice(2, 9)
+      );
+    }
+
+    
+
+    const state = {
+      page: "tasks",
+      filter: "all",
+      selectedDate: today(),
+      month: new Date().getMonth(),
+      year: new Date().getFullYear(),
+      editingId: null,
+      detailId: null
+    };
+
+    function sortedTasks(list) {
+      return [...list].sort((a, b) => {
+        if (a.done !== b.done) {
+          return Number(a.done) - Number(b.done);
+        }
+
+        return deadlineTime(a) - deadlineTime(b);
+      });
+    }
+
+    function reminderText(value) {
+      const options = {
+        off: "Без нагадування",
+        "0": "У момент дедлайну",
+        "15": "За 15 хвилин",
+        "60": "За 1 годину",
+        "1440": "За 1 день"
+      };
+
+      return options[value] || "Без нагадування";
+    }
+
+    
+
+    function renderHeader() {
+      return `
+        <header class="header">
+
+          <div class="brand">
+            <div class="brand-icon">
+              ${icon("book", 24)}
+            </div>
+
+            <div>
+              <div class="brand-name">
+                Дедлайнер<span>.</span>
+              </div>
+              <div class="brand-subtitle">
+                Твій студентський планер
+              </div>
+            </div>
+          </div>
+
+          <div class="avatar">
+            ${icon("user", 22)}
+          </div>
+
+        </header>
+      `;
+    }
+
+    
+
+    function renderTask(task) {
+      const late = isOverdue(task);
+
+      const statusClass = task.done
+        ? "completed"
+        : late ? "late" : "";
+
+      return `
+        <article class="task">
+
+          <button
+            class="task-check ${task.done ? "checked" : ""}"
+            data-toggle="${escapeHTML(task.id)}"
+            aria-label="Змінити стан виконання">
+            ${task.done ? icon("check", 16) : ""}
+          </button>
+
+          <button
+            class="task-body"
+            data-open="${escapeHTML(task.id)}">
+
+            <div class="task-title ${task.done ? "done" : ""}">
+              ${escapeHTML(task.title)}
+            </div>
+
+            <p class="task-description">
+              ${escapeHTML(task.description || "Без опису")}
+            </p>
+
+            <div class="task-tags">
+
+              <span class="tag ${statusClass}">
+                ${icon("calendar", 13)}
+                ${escapeHTML(dateText(task.date))}
+              </span>
+
+              <span class="tag ${statusClass}">
+                ${icon("clock", 13)}
+                ${escapeHTML(task.time)}
+              </span>
+
+              ${
+                task.done
+                  ? '<span class="tag completed">Виконано</span>'
+                  : late
+                    ? '<span class="tag late">Прострочено</span>'
+                    : ""
+              }
+
+            </div>
+
+          </button>
+
+          <div class="task-arrow">
+            ${icon("right", 17)}
+          </div>
+
+        </article>
+      `;
+    }
+
+    function renderEmpty(message) {
+      return `
+        <div class="empty">
+          <span class="empty-emoji">🌷</span>
+          ${message}
+        </div>
+      `;
+    }
+
+    
+
+    function renderTasksPage() {
+      const completed = tasks.filter(task => task.done).length;
+
+      const urgent = tasks.filter(task =>
+        !task.done && task.date <= today()
+      ).length;
+
+      let visible = tasks;
+
+      if (state.filter === "today") {
+        visible = tasks.filter(task => task.date === today());
+      }
+
+      if (state.filter === "future") {
+        visible = tasks.filter(task => task.date > today());
+      }
+
+      visible = sortedTasks(visible);
+
+      return `
+        ${renderHeader()}
+
+        <section class="hero">
+          <div class="hero-label">
+            ✦ ПЛАНУЙ І ВСТИГАЙ
+          </div>
+
+          <h1>
+            Твої дедлайни<br>
+            під контролем!
+          </h1>
+
+          <p>
+            Маленькі кроки сьогодні —
+            великі досягнення завтра.
+          </p>
+
+          <div class="hero-flower">✿</div>
+        </section>
+
+        <section class="stats">
+
+          <div class="stat">
+            <strong>${tasks.length}</strong>
+            <span>Усього</span>
+          </div>
+
+          <div class="stat">
+            <strong>${urgent}</strong>
+            <span>Термінові</span>
+          </div>
+
+          <div class="stat">
+            <strong>${completed}</strong>
+            <span>Виконані</span>
+          </div>
+
+        </section>
+
+        <div class="section-heading">
+          <h2>Мої завдання</h2>
+          <small>${visible.length} завд.</small>
+        </div>
+
+        <div class="filters">
+
+          <button
+            class="filter ${state.filter === "all" ? "active" : ""}"
+            data-filter="all">
+            Всі
+          </button>
+
+          <button
+            class="filter ${state.filter === "today" ? "active" : ""}"
+            data-filter="today">
+            Сьогодні
+          </button>
+
+          <button
+            class="filter ${state.filter === "future" ? "active" : ""}"
+            data-filter="future">
+            Майбутні
+          </button>
+
+        </div>
+
+        ${
+          visible.length
+            ? visible.map(renderTask).join("")
+            : renderEmpty(
+                "Поки немає завдань.<br>Натисни «+», щоб додати перше!"
+              )
+        }
+      `;
+    }
+
+    
+
+    const monthNames = [
+      "Січень",
+      "Лютий",
+      "Березень",
+      "Квітень",
+      "Травень",
+      "Червень",
+      "Липень",
+      "Серпень",
+      "Вересень",
+      "Жовтень",
+      "Листопад",
+      "Грудень"
+    ];
+
+    function renderCalendarPage() {
+      const firstDay = new Date(
+        state.year,
+        state.month,
+        1
+      );
+
+      const offset = (firstDay.getDay() + 6) % 7;
+
+      const daysInMonth = new Date(
+        state.year,
+        state.month + 1,
+        0
+      ).getDate();
+
+      let calendarHTML = "";
+
+      const weekdays = [
+        "Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Нд"
+      ];
+
+      weekdays.forEach(day => {
+        calendarHTML += `
+          <div class="weekday">${day}</div>
+        `;
+      });
+
+      for (let i = 0; i < offset; i++) {
+        calendarHTML += "<div></div>";
+      }
+
+      for (let day = 1; day <= daysInMonth; day++) {
+        const date =
+          state.year + "-" +
+          pad(state.month + 1) + "-" +
+          pad(day);
+
+        const hasTasks = tasks.some(task =>
+          task.date === date
+        );
+
+        const isToday = date === today();
+        const isSelected = date === state.selectedDate;
+
+        calendarHTML += `
+          <button
+            class="calendar-day
+              ${isToday ? "today" : ""}
+              ${isSelected ? "selected" : ""}"
+            data-day="${date}">
+
+            ${day}
+
+            ${
+              hasTasks
+                ? '<span class="calendar-dot"></span>'
+                : ""
+            }
+
+          </button>
+        `;
+      }
+
+      const selectedTasks = sortedTasks(
+        tasks.filter(task =>
+          task.date === state.selectedDate
+        )
+      );
+
+      const selectedLabel = new Date(
+        state.selectedDate + "T12:00:00"
+      ).toLocaleDateString("uk-UA", {
+        day: "numeric",
+        month: "long"
+      });
+
+      return `
+        ${renderHeader()}
+
+        <h1 class="page-title">Календар 📅</h1>
+
+        <p class="page-subtitle">
+          Усі твої дедлайни в одному місці
+        </p>
+
+        <div class="calendar-card">
+
+          <div class="calendar-header">
+
+            <div class="calendar-month">
+              ${monthNames[state.month]} ${state.year}
+            </div>
+
+            <div class="calendar-arrows">
+
+              <button
+                class="icon-button"
+                data-month="-1"
+                aria-label="Попередній місяць">
+                ${icon("left")}
+              </button>
+
+              <button
+                class="icon-button"
+                data-month="1"
+                aria-label="Наступний місяць">
+                ${icon("right")}
+              </button>
+
+            </div>
+
+          </div>
+
+          <div class="calendar-grid">
+            ${calendarHTML}
+          </div>
+
+        </div>
+
+        <div class="section-heading">
+          <h2>${selectedLabel}</h2>
+          <small>${selectedTasks.length} завд.</small>
+        </div>
+
+        ${
+          selectedTasks.length
+            ? selectedTasks.map(renderTask).join("")
+            : renderEmpty(
+                "На цей день завдань немає.<br>Можна трохи відпочити!"
+              )
+        }
+
+        <p class="note">
+          Рожеві крапки показують дні, на які
+          заплановані завдання.
+        </p>
+      `;
+    }
+
+    
+
+    function renderSettingsPage() {
+      return `
+        ${renderHeader()}
+
+        <h1 class="page-title">Налаштування ⚙️</h1>
+
+        <p class="page-subtitle">
+          Зроби Дедлайнер зручним для себе
+        </p>
+
+        <div class="section-heading">
+          <h2>Профіль</h2>
+        </div>
+
+        <div class="settings-card">
+
+          <div class="profile-box">
+
+            <label for="profileName">
+              Твоє ім'я
+            </label>
+
+            <input
+              class="profile-input"
+              id="profileName"
+              maxlength="50"
+              value="${escapeHTML(settings.name)}"
+              placeholder="Введи своє ім'я">
+
+            <button
+              class="primary-button full-width"
+              data-action="saveProfile"
+              style="margin-top: 12px">
+              Зберегти ім'я
+            </button>
+
+          </div>
+
+        </div>
+
+        <div class="section-heading">
+          <h2>Вигляд</h2>
+        </div>
+
+        <div class="settings-card">
+
+          <div class="setting-row">
+
+            <div class="setting-icon">
+              ${icon("moon")}
+            </div>
+
+            <div class="setting-text">
+              <strong>Темна тема</strong>
+              <small>Змінити кольори застосунку</small>
+            </div>
+
+            <button
+              class="switch ${settings.theme === "dark" ? "on" : ""}"
+              data-setting="theme"
+              aria-label="Перемкнути темну тему">
+            </button>
+
+          </div>
+
+        </div>
+
+        <div class="section-heading">
+          <h2>Нагадування</h2>
+        </div>
+
+        <div class="settings-card">
+
+          <div class="setting-row">
+
+            <div class="setting-icon">
+              ${icon("bell")}
+            </div>
+
+            <div class="setting-text">
+              <strong>Увімкнути нагадування</strong>
+              <small>
+                Повідомлення під час відкритої сторінки
+              </small>
+            </div>
+
+            <button
+              class="switch ${settings.notifications ? "on" : ""}"
+              data-setting="notifications"
+              aria-label="Перемкнути нагадування">
+            </button>
+
+          </div>
+
+          <div class="setting-row">
+
+            <div class="setting-icon">
+              ${icon("clock")}
+            </div>
+
+            <div class="setting-text">
+              <strong>Час нагадування</strong>
+              <small>Для нових завдань</small>
+            </div>
+
+            <select
+              class="small-select"
+              id="defaultReminder">
+
+              <option value="off">
+                Вимкнено
+              </option>
+
+              <option value="0">
+                У момент
+              </option>
+
+              <option value="15">
+                За 15 хв
+              </option>
+
+              <option value="60">
+                За 1 год
+              </option>
+
+              <option value="1440">
+                За 1 день
+              </option>
+
+            </select>
+
+          </div>
+
+        </div>
+
+        <div class="section-heading">
+          <h2>Дані</h2>
+        </div>
+
+        <div class="settings-card">
+
+          <div class="setting-row">
+
+            <div class="setting-icon">
+              ${icon("trash")}
+            </div>
+
+            <div class="setting-text">
+              <strong>Очистити виконані</strong>
+              <small>Видалити завершені завдання</small>
+            </div>
+
+            <button
+              class="secondary-button"
+              data-action="clearCompleted">
+              Очистити
+            </button>
+
+          </div>
+
+        </div>
+
+        <p class="note">
+          Дані зберігаються в цьому браузері.
+          Якщо очистити його сховище, завдання можуть
+          зникнути.
+        </p>
+
+        <p class="note">
+          Нагадування в цій версії працюють,
+          поки застосунок відкритий.
+          Для повноцінних фонових push-сповіщень
+          потрібна додаткова реалізація.
+        </p>
+      `;
+    }
+
+    
+
+    function renderNavigation() {
+      const pages = [
+        ["tasks", "Завдання", "home"],
+        ["calendar", "Календар", "calendar"],
+        ["settings", "Налаштування", "settings"]
+      ];
+
+      navigation.innerHTML = pages.map(page => {
+        const [id, label, iconName] = page;
+
+        return `
+          <button
+            class="nav-button ${state.page === id ? "active" : ""}"
+            data-page="${id}">
+
+            ${icon(iconName, 24)}
+
+            <span>${label}</span>
+
+          </button>
+        `;
+      }).join("");
+    }
+
+    
+
+    function render() {
+      app.classList.toggle(
+        "dark",
+        settings.theme === "dark"
+      );
+
+      if (state.page === "calendar") {
+        screen.innerHTML = renderCalendarPage();
+      } else if (state.page === "settings") {
+        screen.innerHTML = renderSettingsPage();
+      } else {
+        screen.innerHTML = renderTasksPage();
+      }
+
+      renderNavigation();
+
+      addButton.innerHTML = icon("plus", 29);
+
+      addButton.hidden = state.page === "settings";
+
+      addButton.style.display =
+        state.page === "settings" ? "none" : "grid";
+
+      const reminderSelect =
+        document.getElementById("defaultReminder");
+
+      if (reminderSelect) {
+        reminderSelect.value = settings.defaultReminder;
+      }
+    }
+
+    
+
+    function openModal(content) {
+      overlay.innerHTML = `
+        <div class="modal" role="dialog" aria-modal="true">
+          ${content}
+        </div>
+      `;
+
+      overlay.hidden = false;
+    }
+
+    function closeModal() {
+      overlay.hidden = true;
+      overlay.innerHTML = "";
+
+      state.editingId = null;
+      state.detailId = null;
+    }
+
+    function modalHeader(title) {
+      return `
+        <div class="modal-header">
+
+          <h2>${title}</h2>
+
+          <button
+            class="close-button"
+            data-action="close"
+            aria-label="Закрити">
+            ${icon("close")}
+          </button>
+
+        </div>
+      `;
+    }
+
+    
+
+    function openTaskForm(id = null) {
+      state.editingId = id;
+
+      const existing = tasks.find(task => task.id === id);
+
+      const task = existing || {
+        title: "",
+        description: "",
+        date: state.page === "calendar"
+          ? state.selectedDate
+          : today(),
+        time: "18:00",
+        reminder: settings.defaultReminder
+      };
+
+      openModal(`
+        ${modalHeader(
+          existing ? "Редагувати завдання" : "Нове завдання ✨"
+        )}
+
+        <form id="taskForm" novalidate>
+
+          <div class="field">
+
+            <label for="taskTitle">
+              Назва завдання *
+            </label>
+
+            <input
+              id="taskTitle"
+              type="text"
+              maxlength="120"
+              placeholder="Наприклад: Здати курсову"
+              value="${escapeHTML(task.title)}">
+
+            <div
+              class="error-message"
+              id="titleError">
+            </div>
+
+          </div>
+
+          <div class="field">
+
+            <label for="taskDescription">
+              Опис
+            </label>
+
+            <textarea
+              id="taskDescription"
+              maxlength="1000"
+              placeholder="Додаткові деталі...">${escapeHTML(task.description)}</textarea>
+
+          </div>
+
+          <div class="form-grid">
+
+            <div class="field">
+
+              <label for="taskDate">
+                Дата *
+              </label>
+
+              <input
+                id="taskDate"
+                type="date"
+                value="${escapeHTML(task.date)}">
+
+            </div>
+
+            <div class="field">
+
+              <label for="taskTime">
+                Час *
+              </label>
+
+              <input
+                id="taskTime"
+                type="time"
+                value="${escapeHTML(task.time)}">
+
+            </div>
+
+          </div>
+
+          <div class="field">
+
+            <label for="taskReminder">
+              Нагадати
+            </label>
+
+            <select id="taskReminder">
+
+              <option value="off">
+                Без нагадування
+              </option>
+
+              <option value="0">
+                У момент дедлайну
+              </option>
+
+              <option value="15">
+                За 15 хвилин
+              </option>
+
+              <option value="60">
+                За 1 годину
+              </option>
+
+              <option value="1440">
+                За 1 день
+              </option>
+
+            </select>
+
+          </div>
+
+          <button
+            class="primary-button full-width"
+            type="submit">
+
+            ${icon("check")}
+
+            ${
+              existing
+                ? "Зберегти зміни"
+                : "Створити завдання"
+            }
+
+          </button>
+
+        </form>
+      `);
+
+      document.getElementById("taskReminder").value =
+        task.reminder || "off";
+
+      document.getElementById("taskTitle").focus();
+    }
+
+    
+
+    function openTaskDetails(id) {
+      const task = tasks.find(item => item.id === id);
+
+      if (!task) return;
+
+      state.detailId = id;
+
+      const status = task.done
+        ? "✓ Виконано"
+        : isOverdue(task)
+          ? "Прострочено"
+          : "Заплановано";
+
+      const statusClass = task.done
+        ? "completed"
+        : isOverdue(task) ? "late" : "";
+
+      openModal(`
+        ${modalHeader("Деталі завдання")}
+
+        <span class="tag ${statusClass}">
+          ${status}
+        </span>
+
+        <h2 class="detail-title">
+          ${escapeHTML(task.title)}
+        </h2>
+
+        <p class="detail-description">${escapeHTML(
+          task.description || "Опис не додано"
+        )}</p>
+
+        <div class="detail-info">
+
+          <div class="info-row">
+            ${icon("calendar")}
+            ${escapeHTML(fullDateText(task.date))}
+          </div>
+
+          <div class="info-row">
+            ${icon("clock")}
+            ${escapeHTML(task.time)}
+          </div>
+
+          <div class="info-row">
+            ${icon("bell")}
+            ${escapeHTML(reminderText(task.reminder))}
+          </div>
+
+        </div>
+
+        <div class="button-row">
+
+          <button
+            class="secondary-button"
+            data-action="edit">
+
+            ${icon("edit")}
+            Редагувати
+
+          </button>
+
+          <button
+            class="secondary-button danger-button"
+            data-action="askDelete">
+
+            ${icon("trash")}
+            Видалити
+
+          </button>
+
+        </div>
+
+        <button
+          class="primary-button full-width"
+          data-action="complete"
+          style="margin-top: 11px">
+
+          ${icon("check")}
+
+          ${
+            task.done
+              ? "Повернути до активних"
+              : "Позначити виконаним"
+          }
+
+        </button>
+      `);
+    }
+
+    
+
+    function askDeleteTask() {
+      openModal(`
+        ${modalHeader("Видалити завдання?")}
+
+        <p class="detail-description">
+          Ти впевнена, що хочеш видалити це завдання?
+          Цю дію неможливо скасувати.
+        </p>
+
+        <div class="button-row">
+
+          <button
+            class="secondary-button"
+            data-action="close">
+            Скасувати
+          </button>
+
+          <button
+            class="primary-button"
+            data-action="confirmDelete">
+            Видалити
+          </button>
+
+        </div>
+      `);
+    }
+
+    
+
+    function showSuccess() {
+      state.editingId = null;
+      state.detailId = null;
+
+      openModal(`
+        <div class="success">
+
+          <span class="confetti left">✨</span>
+          <span class="confetti right">🎉</span>
+
+          <div class="success-icon">
+            ${icon("check", 43)}
+          </div>
+
+          <h2>Завдання додано!</h2>
+
+          <p>
+            Чудово! Ти стала ще на крок
+            ближче до своєї мети.
+          </p>
+
+          <button
+            class="primary-button full-width"
+            data-action="goTasks">
+            До списку завдань
+          </button>
+
+          <button
+            class="secondary-button full-width"
+            data-action="addAnother"
+            style="margin-top: 10px">
+            Додати ще одне
+          </button>
+
+        </div>
+      `);
+    }
+
+    
+
+    let toastTimer;
+
+    function showToast(message) {
+      toast.textContent = message;
+      toast.classList.add("show");
+
+      clearTimeout(toastTimer);
+
+      toastTimer = setTimeout(() => {
+        toast.classList.remove("show");
+      }, 3000);
+    }
+
+    
+
+    function toggleTask(id) {
+      const task = tasks.find(item => item.id === id);
+
+      if (!task) return;
+
+      task.done = !task.done;
+
+      saveTasks();
+      render();
+
+      showToast(
+        task.done
+          ? "✓ Завдання виконано!"
+          : "Завдання знову активне"
+      );
+    }
+
+    
+
+    addButton.addEventListener("click", () => {
+      openTaskForm();
+    });
+
+    app.addEventListener("click", async event => {
+      const button = event.target.closest(
+        "[data-page], [data-filter], [data-toggle], " +
+        "[data-open], [data-day], [data-month], " +
+        "[data-setting], [data-action]"
+      );
+
+      if (!button) return;
+
+      
+      if (button.dataset.page) {
+        state.page = button.dataset.page;
+
+        render();
+        screen.scrollTop = 0;
+        return;
+      }
+
+      
+      if (button.dataset.filter) {
+        state.filter = button.dataset.filter;
+        render();
+        return;
+      }
+
+      
+      if (button.dataset.toggle) {
+        toggleTask(button.dataset.toggle);
+        return;
+      }
+
+      
+      if (button.dataset.open) {
+        openTaskDetails(button.dataset.open);
+        return;
+      }
+
+      
+      if (button.dataset.day) {
+        state.selectedDate = button.dataset.day;
+        render();
+        return;
+      }
+
+      
+      if (button.dataset.month) {
+        const next = new Date(
+          state.year,
+          state.month + Number(button.dataset.month),
+          1
+        );
+
+        state.year = next.getFullYear();
+        state.month = next.getMonth();
+
+        render();
+        return;
+      }
+
+      
+      if (button.dataset.setting) {
+        const setting = button.dataset.setting;
+
+        if (setting === "theme") {
+          settings.theme =
+            settings.theme === "dark"
+              ? "light"
+              : "dark";
+        }
+
+        if (setting === "notifications") {
+          settings.notifications = !settings.notifications;
+
+          
+          if (
+            settings.notifications &&
+            "Notification" in window &&
+            window.isSecureContext &&
+            Notification.permission === "default"
+          ) {
+            try {
+              await Notification.requestPermission();
+            } catch (error) {
+              console.warn(error);
+            }
+          }
+
+          showToast(
+            settings.notifications
+              ? "Нагадування увімкнено 🔔"
+              : "Нагадування вимкнено"
+          );
+        }
+
+        saveSettings();
+        render();
+        return;
+      }
+
+      const action = button.dataset.action;
+
+      if (action === "close") {
+        closeModal();
+      }
+
+      if (action === "edit") {
+        const id = state.detailId;
+        openTaskForm(id);
+      }
+
+      if (action === "askDelete") {
+        askDeleteTask();
+      }
+
+      if (action === "confirmDelete") {
+        tasks = tasks.filter(task =>
+          task.id !== state.detailId
+        );
+
+        saveTasks();
+        closeModal();
+        render();
+
+        showToast("Завдання видалено");
+      }
+
+      if (action === "complete") {
+        const id = state.detailId;
+
+        closeModal();
+        toggleTask(id);
+      }
+
+      if (action === "goTasks") {
+        closeModal();
+
+        state.page = "tasks";
+        state.filter = "all";
+
+        render();
+        screen.scrollTop = 0;
+      }
+
+      if (action === "addAnother") {
+        closeModal();
+        openTaskForm();
+      }
+
+      if (action === "saveProfile") {
+        const input = document.getElementById("profileName");
+
+        settings.name = input.value.trim() || "Студентка";
+
+        saveSettings();
+        render();
+
+        showToast("Ім'я збережено 💗");
+      }
+
+      if (action === "clearCompleted") {
+        const completedCount =
+          tasks.filter(task => task.done).length;
+
+        if (completedCount === 0) {
+          showToast("Немає виконаних завдань");
+          return;
+        }
+
+        const confirmed = confirm(
+          "Видалити всі виконані завдання?"
+        );
+
+        if (!confirmed) return;
+
+        tasks = tasks.filter(task => !task.done);
+
+        saveTasks();
+        render();
+
+        showToast("Виконані завдання очищено");
+      }
+    });
+
+    
+
+    app.addEventListener("submit", event => {
+      if (event.target.id !== "taskForm") return;
+
+      event.preventDefault();
+
+      const titleInput =
+        document.getElementById("taskTitle");
+
+      const descriptionInput =
+        document.getElementById("taskDescription");
+
+      const dateInput =
+        document.getElementById("taskDate");
+
+      const timeInput =
+        document.getElementById("taskTime");
+
+      const reminderInput =
+        document.getElementById("taskReminder");
+
+      const titleError =
+        document.getElementById("titleError");
+
+      titleInput.classList.remove("invalid");
+      titleError.textContent = "";
+
+      const title = titleInput.value.trim();
+
+
+      if (!title) {
+        titleInput.classList.add("invalid");
+        titleError.textContent =
+          "Введи назву завдання";
+
+        titleInput.focus();
+        return;
+      }
+
+      if (!dateInput.value || !timeInput.value) {
+        showToast("Обери дату й час");
+        return;
+      }
+
+      const existing = tasks.find(task =>
+        task.id === state.editingId
+      );
+
+      const newTask = {
+        id: existing ? existing.id : createId(),
+        title: title,
+        description: descriptionInput.value.trim(),
+        date: dateInput.value,
+        time: timeInput.value,
+        reminder: reminderInput.value,
+        done: existing ? existing.done : false
+      };
+
+      if (existing) {
+        tasks = tasks.map(task =>
+          task.id === existing.id ? newTask : task
+        );
+      } else {
+        tasks.push(newTask);
+      }
+
+      saveTasks();
+
+      state.page = "tasks";
+      state.filter = "all";
+
+      render();
+
+      if (existing) {
+        closeModal();
+        showToast("✓ Зміни збережено!");
+      } else {
+        showSuccess();
+      }
+    });
+
+    
+
+    app.addEventListener("change", event => {
+      if (event.target.id === "defaultReminder") {
+        settings.defaultReminder = event.target.value;
+
+        saveSettings();
+        showToast("Налаштування збережено");
+      }
+    });
+
+    
+
+    overlay.addEventListener("click", event => {
+      if (event.target === overlay) {
+        closeModal();
+      }
+    });
+
+    document.addEventListener("keydown", event => {
+      if (event.key === "Escape" && !overlay.hidden) {
+        closeModal();
+      }
+    });
+
+    
+
+    function checkReminders() {
+      if (!settings.notifications) return;
+
+      const now = Date.now();
+
+      for (const task of tasks) {
+        if (task.done || task.reminder === "off") {
+          continue;
+        }
+
+        const deadline = deadlineTime(task);
+
+        const reminderAt =
+          deadline - Number(task.reminder) * 60 * 1000;
+
+        const reminderKey = [
+          task.id,
+          task.date,
+          task.time,
+          task.reminder
+        ].join("|");
+
+        
+        if (
+          now >= reminderAt &&
+          now < reminderAt + 60 * 1000 &&
+          !sentReminders.has(reminderKey)
+        ) {
+          sentReminders.add(reminderKey);
+
+          writeStorage(
+            REMINDERS_KEY,
+            [...sentReminders]
+          );
+
+          showToast("🔔 Нагадування: " + task.title);
+
+
+          if (
+            "Notification" in window &&
+            Notification.permission === "granted"
+          ) {
+            try {
+              new Notification("Дедлайнер 🔔", {
+                body:
+                  task.title +
+                  " — " +
+                  dateText(task.date) +
+                  " о " +
+                  task.time
+              });
+            } catch (error) {
+              console.warn(error);
+            }
+          }
+        }
+      }
+    }
+
+    
+    setInterval(checkReminders, 15000);
+
+    document.addEventListener(
+      "visibilitychange",
+      checkReminders
+    );
+
+    render();
+    checkReminders();
+
+    console.log("💗 Дедлайнер успішно запущено!");
+  </script>
+
+</body>
+</html>
